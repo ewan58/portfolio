@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ewan Roy — Alternant Cybersécurité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c14;
+    --bg2: #0d1220;
+    --bg3: #111827;
+    --green: #00e87a;
+    --blue: #38bdf8;
+    --purple: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.06);
+    --card: rgba(255,255,255,0.03);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,232,122,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,232,122,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(8,12,20,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--green);
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo span { color: var(--text); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--green); }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 100px;
+  }
+
+  .hero-eyebrow {
+    color: var(--green);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .hero-eyebrow::before {
+    content: '> ';
+    color: var(--muted);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s forwards;
+  }
+
+  h1 .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+  }
+
+  h1 .accent { color: var(--green); }
+
+  .hero-desc {
+    max-width: 560px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.6s forwards;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s forwards;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green);
+    color: #000;
+    padding: 12px 24px;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: #fff;
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 24px;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--green);
+    color: var(--green);
+    transform: translateY(-2px);
+  }
+
+  .hero-status {
+    position: absolute;
+    bottom: 3rem;
+    left: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 0.6s 1s forwards;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-label::before { content: '// '; color: var(--muted); }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* SKILLS */
+  #skills { background: transparent; }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+  }
+
+  .skill-category {
+    padding: 2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+
+  .skill-category:hover { background: rgba(0,232,122,0.04); }
+
+  .skill-category-title {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+
+  .tag:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .tag.highlight {
+    border-color: rgba(0,232,122,0.3);
+    color: var(--green);
+    background: rgba(0,232,122,0.06);
+  }
+
+  /* PROJECTS */
+  .projects-grid {
+    display: grid;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .project-card {
+    background: var(--bg);
+    padding: 2rem 2.5rem;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 2rem;
+    align-items: start;
+    transition: background 0.2s;
+    cursor: default;
+  }
+
+  .project-card:hover {
+    background: var(--bg2);
+  }
+
+  .project-num {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    padding-top: 4px;
+  }
+
+  .project-num span {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.06);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .project-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .project-desc {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ptag {
+    font-size: 10px;
+    padding: 3px 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ptag.sys { background: rgba(56,189,248,0.1); color: var(--blue); border: 1px solid rgba(56,189,248,0.2); }
+  .ptag.sec { background: rgba(0,232,122,0.08); color: var(--green); border: 1px solid rgba(0,232,122,0.2); }
+  .ptag.net { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+  .ptag.mgmt { background: rgba(251,191,36,0.08); color: #fbbf24; border: 1px solid rgba(251,191,36,0.15); }
+
+  .project-arrow {
+    color: var(--muted);
+    font-size: 20px;
+    padding-top: 4px;
+    transition: all 0.2s;
+  }
+
+  .project-card:hover .project-arrow {
+    color: var(--green);
+    transform: translateX(4px);
+  }
+
+  /* ABOUT */
+  #about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  #about section {
+    padding: 0;
+  }
+
+  .about-text p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 1rem;
+  }
+
+  .about-text p strong { color: var(--text); }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  .stat {
+    background: var(--bg);
+    padding: 1.5rem;
+  }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; }
+
+  .cert-list {
+    list-style: none;
+    margin-top: 1.5rem;
+  }
+
+  .cert-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .cert-list li::before {
+    content: '◆';
+    color: var(--green);
+    font-size: 8px;
+  }
+
+  /* CONTACT */
+  #contact-section {
+    text-align: center;
+    padding: 6rem 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .contact-email {
+    display: inline-block;
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 700;
+    color: var(--green);
+    text-decoration: none;
+    margin: 2rem 0;
+    padding-bottom: 4px;
+    border-bottom: 2px solid var(--green);
+    transition: all 0.2s;
+  }
+
+  .contact-email:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .contact-note {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 1rem;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
+    50% { opacity: 0.5; box-shadow: 0 0 2px var(--green); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* DIVIDER */
+  .divider {
+    position: relative;
+    z-index: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    #about { grid-template-columns: 1fr; gap: 2rem; }
+    .project-card { grid-template-columns: 1fr; gap: 1rem; }
+    .project-num span { display: inline; font-size: 1.2rem; margin-right: 8px; }
+    .nav-links { display: none; }
+    h1 { font-size: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">ER<span>_</span></div>
+  <ul class="nav-links">
+    <li><a href="#projets">Projets</a></li>
+    <li><a href="#competences">Compétences</a></li>
+    <li><a href="#apropos">Profil</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <p class="hero-eyebrow">Disponible pour alternance — Région Vichy / Clermont-Ferrand</p>
+  <h1>
+    Ewan<br>
+    <span class="line2">Roy<span class="accent">.</span></span>
+  </h1>
+  <p class="hero-desc">
+    Administrateur systèmes, réseaux et cybersécurité en formation.<br>
+    Spécialisé en sécurité offensive & défensive — Active Directory, pentest, firewalling, supervision.
+  </p>
+  <div class="hero-cta">
+    <a href="#projets" class="btn-primary">Voir mes projets →</a>
+    <a href="mailto:ewanroy58@gmail.com" class="btn-ghost">✉ ewanroy58@gmail.com</a>
+  </div>
+  <div class="hero-status">
+    <span class="status-dot"></span>
+    Alternant Cybersécurité — Formation ASRC OpenClassrooms (Bac+3 RNCP)
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROJECTS -->
+<section id="projets" style="max-width:1100px;margin:0 auto;padding:6rem 2rem;">
+  <div class="section-header reveal">
+    <p class="section-label">Projets</p>
+    <h2>12 projets<br>professionnalisants</h2>
+  </div>
+
+  <div class="projects-grid reveal">
+
+    <div class="project-card">
+      <div class="project-num"><span>02</span>P2</div>
+      <div>
+        <p class="project-name">Gestion des demandes au quotidien</p>
+        <p class="project-desc">Prise en charge des tickets utilisateurs, rédaction de procédures de support et gestion des incidents N1/N2 via un outil de ticketing ITSM.</p>
+        <div class="project-tags">
+          <span class="ptag sys">GLPI</span>
+          <span class="ptag mgmt">ITIL</span>
+          <span class="ptag sys">Helpdesk</span>
+          <span class="ptag mgmt">Documentation</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>03</span>P3</div>
+      <div>
+        <p class="project-name">Conception et déploiement d'un réseau local</p>
+        <p class="project-desc">Modélisation et déploiement d'une infrastructure réseau pour une startup : adressage IP, VLAN, spanning tree, documentation technique complète.</p>
+        <div class="project-tags">
+          <span class="ptag net">Cisco Packet Tracer</span>
+          <span class="ptag net">VLAN</span>
+          <span class="ptag net">STP</span>
+          <span class="ptag net">IPv4/IPv6</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>04</span>P4</div>
+      <div>
+        <p class="project-name">Architecture n-tiers pour une PME</p>
+        <p class="project-desc">Déploiement d'un domaine Windows Server avec Active Directory, DNS, DHCP, GPO et gestion des utilisateurs dans un environnement virtualisé.</p>
+        <div class="project-tags">
+          <span class="ptag sys">Windows Server</span>
+          <span class="ptag sys">Active Directory</span>
+          <span class="ptag sys">DNS / DHCP</span>
+          <span class="ptag sys">GPO</span>
+          <span class="ptag sys">VirtualBox</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>05</span>P5</div>
+      <div>
+        <p class="project-name">Services web sécurisés</p>
+        <p class="project-desc">Mise en place d'un serveur LAMP sous Linux, configuration HTTPS, durcissement Apache, pare-feu iptables et gestion des certificats TLS.</p>
+        <div class="project-tags">
+          <span class="ptag sys">Linux</span>
+          <span class="ptag sys">Apache / LAMP</span>
+          <span class="ptag sec">HTTPS / TLS</span>
+          <span class="ptag sec">iptables</span>
+          <span class="ptag sec">Durcissement</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>06</span>P6</div>
+      <div>
+        <p class="project-name">Raccordement d'une entité au SI d'entreprise</p>
+        <p class="project-desc">Interconnexion sécurisée d'un site distant via tunnel VPN IPSec, configuration du routage inter-sites et intégration des postes au domaine.</p>
+        <div class="project-tags">
+          <span class="ptag net">VPN IPSec</span>
+          <span class="ptag net">Routage</span>
+          <span class="ptag sec">Chiffrement</span>
+          <span class="ptag sys">Windows Server</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>07</span>P7</div>
+      <div>
+        <p class="project-name">Services réseaux et équipements d'interconnexion</p>
+        <p class="project-desc">Configuration avancée d'équipements Cisco : protocoles de routage dynamique OSPF et EIGRP, redondance réseau, HSRP et optimisation des flux.</p>
+        <div class="project-tags">
+          <span class="ptag net">Cisco IOS</span>
+          <span class="ptag net">OSPF</span>
+          <span class="ptag net">EIGRP</span>
+          <span class="ptag net">HSRP</span>
+          <span class="ptag net">Packet Tracer</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>08</span>P8</div>
+      <div>
+        <p class="project-name">Supervision du SI d'une entreprise</p>
+        <p class="project-desc">Déploiement d'une solution de monitoring avec Nagios : surveillance des hôtes, services, alertes, tableaux de bord et escalades d'incidents.</p>
+        <div class="project-tags">
+          <span class="ptag sys">Nagios</span>
+          <span class="ptag sys">SNMP</span>
+          <span class="ptag mgmt">Monitoring</span>
+          <span class="ptag sys">Linux</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>09</span>P9</div>
+      <div>
+        <p class="project-name">Gestion du parc informatique d'une PME</p>
+        <p class="project-desc">Inventaire et gestion du parc via GLPI, déploiement de postes, gestion des licences, cartographie du SI et procédures de maintenance préventive.</p>
+        <div class="project-tags">
+          <span class="ptag sys">GLPI</span>
+          <span class="ptag mgmt">CMDB</span>
+          <span class="ptag mgmt">Inventaire</span>
+          <span class="ptag sys">Déploiement</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>10</span>P10</div>
+      <div>
+        <p class="project-name">Solution de sauvegarde et PRA</p>
+        <p class="project-desc">Conception et mise en place d'une politique de sauvegarde 3-2-1, tests de restauration, plan de reprise d'activité et documentation des procédures.</p>
+        <div class="project-tags">
+          <span class="ptag sec">Sauvegarde 3-2-1</span>
+          <span class="ptag mgmt">PRA / PCA</span>
+          <span class="ptag sys">Veeam</span>
+          <span class="ptag sys">rsync</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>11</span>P11</div>
+      <div>
+        <p class="project-name">Sécurisation du réseau d'une grande entreprise</p>
+        <p class="project-desc">Déploiement et configuration d'un firewall Stormshield : règles de filtrage, segmentation réseau, zones DMZ, politique de sécurité et journalisation.</p>
+        <div class="project-tags">
+          <span class="ptag sec">Stormshield</span>
+          <span class="ptag sec">Firewall</span>
+          <span class="ptag net">DMZ</span>
+          <span class="ptag sec">ANSSI</span>
+          <span class="ptag net">Segmentation</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>12</span>P12</div>
+      <div>
+        <p class="project-name">Audit sécurité — Domaine Windows & Active Directory</p>
+        <p class="project-desc">Pentest complet d'un domaine Active Directory sur infrastructure root-me.pro : reconnaissance, élévation de privilèges, extraction NTLM (lsassy), Pass-the-Hash, dump NTDS. Rapport de 12 vulnérabilités et plan d'action.</p>
+        <div class="project-tags">
+          <span class="ptag sec">Pentest AD</span>
+          <span class="ptag sec">Pass-the-Hash</span>
+          <span class="ptag sec">lsassy</span>
+          <span class="ptag sec">CrackMapExec</span>
+          <span class="ptag sec">Rapport d'audit</span>
+          <span class="ptag sec">Root-me Pro</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num"><span>13</span>P13</div>
+      <div>
+        <p class="project-name">Pilotage d'un projet SI</p>
+        <p class="project-desc">Gestion de bout en bout d'un projet d'évolution du SI : analyse des besoins, planification, rédaction de cahier des charges, suivi et présentation aux parties prenantes.</p>
+        <div class="project-tags">
+          <span class="ptag mgmt">Gestion de projet</span>
+          <span class="ptag mgmt">ITIL</span>
+          <span class="ptag mgmt">Documentation</span>
+          <span class="ptag mgmt">Présentation</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section id="competences" style="max-width:1100px;margin:0 auto;padding:6rem 2rem;">
+  <div class="section-header reveal">
+    <p class="section-label">Compétences</p>
+    <h2>Stack technique</h2>
+  </div>
+
+  <div class="skills-grid reveal">
+    <div class="skill-category">
+      <p class="skill-category-title">Systèmes</p>
+      <div class="skill-tags">
+        <span class="tag highlight">Linux (Debian/Ubuntu)</span>
+        <span class="tag highlight">Windows Server</span>
+        <span class="tag">Active Directory</span>
+        <span class="tag">GPO</span>
+        <span class="tag">VirtualBox</span>
+        <span class="tag">Docker</span>
+        <span class="tag">Bash</span>
+        <span class="tag">PowerShell</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <p class="skill-category-title">Réseaux</p>
+      <div class="skill-tags">
+        <span class="tag highlight">Cisco IOS</span>
+        <span class="tag highlight">VLAN / OSPF / EIGRP</span>
+        <span class="tag">DHCP / DNS</span>
+        <span class="tag">VPN IPSec</span>
+        <span class="tag">IPv4 / IPv6</span>
+        <span class="tag">Packet Tracer</span>
+        <span class="tag">Wireshark</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <p class="skill-category-title">Cybersécurité</p>
+      <div class="skill-tags">
+        <span class="tag highlight">Stormshield</span>
+        <span class="tag highlight">Pentest AD</span>
+        <span class="tag highlight">Kali Linux</span>
+        <span class="tag">lsassy / CrackMapExec</span>
+        <span class="tag">Pass-the-Hash</span>
+        <span class="tag">CrowdSec</span>
+        <span class="tag">Audit ANSSI</span>
+        <span class="tag">NTDS dump</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <p class="skill-category-title">Administration & outils</p>
+      <div class="skill-tags">
+        <span class="tag">GLPI</span>
+        <span class="tag">Nagios</span>
+        <span class="tag">Ansible</span>
+        <span class="tag">Python</span>
+        <span class="tag">Git</span>
+        <span class="tag">AWS (lab)</span>
+        <span class="tag">ITIL</span>
+        <span class="tag">Root-me Pro</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<div id="apropos" style="max-width:1100px;margin:0 auto;padding:6rem 2rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;">
+  <div class="reveal">
+    <p class="section-label" style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:0.75rem;">// Profil</p>
+    <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:700;letter-spacing:-0.02em;line-height:1.1;margin-bottom:2rem;">À propos</h2>
+    <div class="about-text">
+      <p>Passionné par la cybersécurité et l'administration des systèmes d'information, je recherche une <strong>alternance Cybersécurité</strong> dans la région Vichy / Clermont-Ferrand pour préparer mon Master.</p>
+      <p>Ma formation ASRC chez OpenClassrooms m'a permis de développer une expertise concrète sur l'ensemble du cycle de vie d'un SI : conception, déploiement, administration, supervision et sécurisation.</p>
+      <p>Point fort : mon projet P12 de <strong>pentest Active Directory</strong> sur infrastructure dédiée root-me.pro, avec rapport professionnel, plan d'action et présentation orale — une expérience terrain rare pour un profil junior.</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat">
+        <p class="stat-val">12</p>
+        <p class="stat-label">Projets réalisés</p>
+      </div>
+      <div class="stat">
+        <p class="stat-val">Bac+3</p>
+        <p class="stat-label">RNCP — Titre certifié</p>
+      </div>
+      <div class="stat">
+        <p class="stat-val">AD</p>
+        <p class="stat-label">Pentest complet</p>
+      </div>
+      <div class="stat">
+        <p class="stat-val">≥1</p>
+        <p class="stat-label">An d'alternance</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <p class="section-label" style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:0.75rem;">// Formation & certifications</p>
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:1.5rem;">Parcours</h2>
+    <ul class="cert-list">
+      <li>Administrateur Systèmes, Réseaux & Cybersécurité — OpenClassrooms (RNCP Bac+3)</li>
+      <li>Stormshield Academy — Configuration firewall SNS</li>
+      <li>Root-me Pro — Lab pentest Active Directory</li>
+      <li>Cisco Packet Tracer — Réseaux avancés</li>
+      <li>AWS Cloud Foundations (lab pratique)</li>
+      <li>Licence informatique</li>
+    </ul>
+
+    <div style="margin-top:2rem;padding:1.5rem;border:1px solid rgba(0,232,122,0.2);background:rgba(0,232,122,0.04);">
+      <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--green);margin-bottom:0.5rem;">Recherche active</p>
+      <p style="font-size:13px;color:var(--muted);">Alternance Cybersécurité / Sysadmin<br>Vichy · Clermont-Ferrand · France</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<div id="contact">
+  <section id="contact-section" class="reveal">
+    <p class="section-label" style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:0.75rem;">// Contact</p>
+    <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:700;letter-spacing:-0.02em;">Discutons de<br>votre alternance</h2>
+    <a href="mailto:ewanroy58@gmail.com" class="contact-email">ewanroy58@gmail.com</a>
+    <p class="contact-note">Disponible pour un entretien — réponse sous 24h</p>
+    <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="mailto:ewanroy58@gmail.com" class="btn-primary">Envoyer un email →</a>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <p>© 2025 Ewan Roy — Alternant Cybersécurité &nbsp;·&nbsp; Formation ASRC OpenClassrooms</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav active state
+  const sections = document.querySelectorAll('[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
+    });
+  });
+</script>
+</body>
+</html>
