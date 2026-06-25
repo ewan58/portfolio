@@ -289,24 +289,25 @@
   }
 
   .tag {
-    font-size: 11px;
-    padding: 4px 10px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    transition: all 0.2s;
-  }
+  font-size: 11px;
+  padding: 4px 10px;
+  border: 1px solid rgba(0,232,122,0.3);
+  color: var(--green);
+  background: rgba(0,232,122,0.06);
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
 
-  .tag:hover {
-    border-color: var(--green);
-    color: var(--green);
-  }
+.tag:hover {
+  border-color: var(--green);
+  background: rgba(0,232,122,0.12);
+}
 
-  .tag.highlight {
-    border-color: rgba(0,232,122,0.3);
-    color: var(--green);
-    background: rgba(0,232,122,0.06);
-  }
+.tag.highlight {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(0,232,122,0.1);
+}
 
   /* PROJECTS */
   .projects-grid {
